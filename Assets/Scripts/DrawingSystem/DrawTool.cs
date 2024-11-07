@@ -1,3 +1,4 @@
+using DrawingSystem.Commands;
 using UnityEngine;
 
 namespace DrawingSystem
@@ -9,6 +10,9 @@ namespace DrawingSystem
         //private List<Vector2> points;
         Vector2 point;
 
+
+        private DrawCommand _command;
+        
         private Color[] finalSnapshot;
         
         //When we begin our press, we must begin transacting / recording
@@ -16,7 +20,9 @@ namespace DrawingSystem
         {
             //We can assume once we begin drawing, that the colour will remain constant.
             color = CanvasController.Instance.color;
-          
+
+            _command = new DrawCommand();
+
         }
         
         //while the mouse is updating, draw over each tile
@@ -62,13 +68,14 @@ namespace DrawingSystem
               }
               
               CanvasController.Instance.DrawPixels(locations, colors);
+              _command.PushPoints(locations, colors);
             }
         }
 
         //TODO: When we end our press, we should send our transaction as a command
         public void OnLeftClickEnd(Vector2 location)
         {
-            
+            CanvasController.Instance.PushCommand(_command);
         }
     }
 }

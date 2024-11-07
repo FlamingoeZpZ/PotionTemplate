@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Managers;
 using UnityEngine;
@@ -14,6 +15,9 @@ namespace DrawingSystem
         private IDrawingTool currentTool;
         
         [SerializeField] private DrawingCanvas canvas;
+        
+        private readonly Stack<ICanvasCommand> undoStack = new Stack<ICanvasCommand>();
+        private readonly Stack<ICanvasCommand> redoStack = new Stack<ICanvasCommand>();
         
         private string fileLocation;
         
@@ -54,12 +58,20 @@ namespace DrawingSystem
         
         public void Undo()
         {
-            throw new NotImplementedException();
+            if (undoStack.TryPop(out ICanvasCommand command))
+            {
+                command.Undo();
+                redoStack.Push(command);
+            }
         }
 
         public void Redo()
         {
-            throw new NotImplementedException();
+            if (redoStack.TryPop(out ICanvasCommand command))
+            {
+                command.Redo();
+                undoStack.Push(command);
+            }
         }
 
         public async void Save()
@@ -86,6 +98,12 @@ namespace DrawingSystem
         public void DrawPixels(Color[] colors) //Used if you wanted to redraw the ENTIRE canvas.
         {
             canvas.UpdateImage(colors);
+        }
+
+        public void PushCommand(ICanvasCommand command)
+        {
+            undoStack.Push(command);
+            redoStack.Clear();
         }
 
 

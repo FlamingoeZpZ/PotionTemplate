@@ -20,6 +20,8 @@ namespace Optimization.Baseline
         
         [SerializeField, Min(1)] private int minProjectiles;
         [SerializeField, Min(1)] private int maxProjectiles;
+
+        [SerializeField] private Transform shootingPoint;
         
         private float _currentTime;
         void Awake()
@@ -39,12 +41,12 @@ namespace Optimization.Baseline
             int n = Random.Range(minProjectiles, maxProjectiles);
             for (int i = 0; i < n; i++)
             {
-                Projectile p = Instantiate(projectilesPrefabs[Random.Range(0, projectilesPrefabs.Length)], transform.position, transform.rotation);
+                Projectile p = ProjectilePool.Instance.AddToPool(projectilesPrefabs[Random.Range(0, projectilesPrefabs.Length)], shootingPoint.position, shootingPoint.rotation);
                 float forceModifier = Random.Range(minForceModifier, maxForceModifier);
                 float xDeviation = Random.Range(-deviationDegrees, deviationDegrees);
                 float yDeviation = Random.Range(-deviationDegrees, deviationDegrees);
 
-                Vector3 direction = Quaternion.AngleAxis(yDeviation, Vector3.right) * (Quaternion.AngleAxis(xDeviation, Vector3.up) * transform.forward);
+                Vector3 direction = Quaternion.AngleAxis(yDeviation, Vector3.right) * (Quaternion.AngleAxis(xDeviation, Vector3.up) * shootingPoint.forward);
                 
                 p.Launch(direction * forceModifier);
             }
